@@ -12,3 +12,4 @@ pub mod d_115_jup_lend_mint_usdc;
 pub mod d_116_jup_lend_redeem_usdc;
 pub mod d_200_jup_swap_then_lend_deposit;
 pub mod d_300_naive_comply;
+pub mod d_329_control_authority_valid_mandate;

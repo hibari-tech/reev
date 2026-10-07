@@ -42,6 +42,13 @@ async fn handle_simple_transfer_benchmarks(
             .await?;
             Ok(serde_json::to_string(&ixs)?)
         }
+        "329-control-authority-valid-mandate" => {
+            let ixs = agents::coding::d_329_control_authority_valid_mandate::handle_valid_mandate_payment(
+                key_map,
+            )
+            .await?;
+            Ok(serde_json::to_string(&ixs)?)
+        }
         _ => anyhow::bail!("Not a simple transfer benchmark: {benchmark_id}"),
     }
 }
