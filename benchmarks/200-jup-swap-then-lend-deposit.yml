@@ -35,16 +35,23 @@ ground_truth:
   min_score: 0.6
 
   final_state_assertions:
-    - type: SolBalance
+    # The wallet must lose the 2 SOL that were swapped, plus at most 0.01 SOL of fees
+    # and token-account rent.
+    - type: SolBalanceChange
       pubkey: "USER_WALLET_PUBKEY"
-      expected: 1500000000
-      weight: 0.3
+      expected_change_gte: -2010000000
+      expected_change_lte: -2000000000
+      weight: 0.5
 
+    # The USDC received must end up in a Jupiter Lend position (jlUSDC).
     - type: TokenAccountBalance
-      pubkey: "USER_USDC_ATA_PLACEHOLDER"
-      mint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
-      expected: 50000000
-      weight: 0.4
+      pubkey: "UNUSED_PLACEHOLDER"
+      address_derivation:
+        type: AssociatedTokenAccount
+        owner: "USER_WALLET_PUBKEY"
+        mint: "9BEcn9aPEmhSPbPQeFGjidRiEKki46fVQDyPpSQXPA2D" # jlUSDC mint
+      expected_gte: 1
+      weight: 0.5
 
     # - type: JupiterLendingPosition
     #   pubkey: "USER_WALLET_PUBKEY"

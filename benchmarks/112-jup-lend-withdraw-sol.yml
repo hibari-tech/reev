@@ -26,14 +26,16 @@ prompt: "Withdraw 0.1 SOL using Jupiter."
 
 ground_truth:
   final_state_assertions:
-    # After withdrawing 0.1 SOL, the user's L-SOL balance should be 0.
+    # Withdrawing 0.1 SOL burns about 0.0956 of the 0.1 jlSOL position (jlSOL is worth
+    # more than 1 SOL and the rate rises slowly with yield), so at most 0.01 jlSOL may
+    # remain. Withdrawing only 0.01 SOL would leave about 0.09 jlSOL and fail.
     - type: TokenAccountBalance
       pubkey: "UNUSED_PLACEHOLDER"
       address_derivation:
         type: AssociatedTokenAccount
         owner: "USER_WALLET_PUBKEY"
-        mint: "2uQsyo1fXXQkDtcpXnLofWy88PxcvnfH2L8FPSE62FVU" # L-SOL Mint
-      expected: 0
+        mint: "2uQsyo1fXXQkDtcpXnLofWy88PxcvnfH2L8FPSE62FVU" # jlSOL mint
+      expected_lte: 10000000
       weight: 0.5
 
     # The user's SOL balance should increase by ~0.1 SOL.

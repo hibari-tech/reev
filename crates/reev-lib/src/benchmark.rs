@@ -147,6 +147,12 @@ pub enum StateAssertion {
         pubkey: String,
         /// The expected minimum change in lamports (can be negative).
         expected_change_gte: i64,
+        /// The expected maximum change in lamports (can be negative). Together with
+        /// `expected_change_gte` this bounds the amount that moved, e.g. a 0.1 SOL deposit
+        /// is `[-105000000, -100000000]`: at least 0.1 SOL left the wallet, at most 0.105
+        /// including fees and rent.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        expected_change_lte: Option<i64>,
         /// The weight of this assertion for scoring. Defaults to 1.0.
         #[serde(default = "default_weight")]
         weight: f64,
@@ -161,6 +167,9 @@ pub enum StateAssertion {
         /// The expected minimum token balance.
         #[serde(default, skip_serializing_if = "Option::is_none")]
         expected_gte: Option<u64>,
+        /// The expected maximum token balance (in the smallest unit).
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        expected_lte: Option<u64>,
         /// Optional field to derive the token account address dynamically.
         #[serde(default, skip_serializing_if = "Option::is_none")]
         address_derivation: Option<AddressDerivation>,

@@ -28,12 +28,13 @@ prompt: "Using Jupiter, swap 0.1 SOL for USDC. My USDC token account is USER_USD
 
 ground_truth:
   final_state_assertions:
-    # The exact final SOL balance is non-deterministic due to transaction fees.
-    # We assert that the balance has decreased by at least 0.1 SOL (100,000,000 lamports).
-    # A slightly larger amount is used to account for potential fees.
+    # The wallet must lose the 0.1 SOL that was swapped, plus at most 0.005 SOL of
+    # fees and token-account rent. The lower bound checks the amount, the upper bound
+    # catches a swap of more than was asked for.
     - type: SolBalanceChange
       pubkey: "USER_WALLET_PUBKEY"
-      expected_change_gte: -100005000
+      expected_change_gte: -105000000
+      expected_change_lte: -100000000
       weight: 1.0
 
     # The exact output amount of USDC is non-deterministic.

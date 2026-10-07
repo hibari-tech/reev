@@ -17,13 +17,25 @@ prompt: "Deposit 0.1 SOL into Jupiter lending."
 
 ground_truth:
   final_state_assertions:
-    # The exact final SOL balance is non-deterministic due to transaction fees.
-    # We assert that the balance has decreased by at least 0.1 SOL (100,000,000 lamports).
-    # A slightly larger amount is used to account for potential fees.
+    # The wallet must lose the 0.1 SOL that was deposited, plus at most 0.005 SOL of
+    # fees and token-account rent (a deposit creates the jlSOL and wrapped-SOL accounts:
+    # 2 x 2039280 lamports + 5000 fee = 0.104 SOL in the reference run). The lower bound
+    # checks the amount: depositing 0.01 SOL fails it.
     - type: SolBalanceChange
       pubkey: "USER_WALLET_PUBKEY"
       expected_change_gte: -105000000
-      weight: 1.0
+      expected_change_lte: -100000000
+      weight: 0.5
+
+    # The deposit must leave a Jupiter Lend SOL position (jlSOL) in the user's wallet.
+    - type: TokenAccountBalance
+      pubkey: "UNUSED_PLACEHOLDER"
+      address_derivation:
+        type: AssociatedTokenAccount
+        owner: "USER_WALLET_PUBKEY"
+        mint: "2uQsyo1fXXQkDtcpXnLofWy88PxcvnfH2L8FPSE62FVU" # jlSOL mint
+      expected_gte: 1
+      weight: 0.5
 
   # For this complex DeFi interaction, success is determined by the on-chain state assertions,
   # not by a deterministic instruction set.

@@ -36,25 +36,26 @@ prompt: "Withdraw 50 USDC using Jupiter."
 
 ground_truth:
   final_state_assertions:
-    # After withdrawing 50 USDC, the user's L-Token balance should be effectively zero.
+    # Withdrawing 50 USDC burns about 47 of the 50 jlUSDC (jlUSDC is worth more than
+    # 1 USDC and the rate rises slowly with yield), so at most 5 jlUSDC may remain.
+    # Withdrawing only 10 USDC would leave about 40.6 jlUSDC and fail.
     - type: TokenAccountBalance
       pubkey: "UNUSED_PLACEHOLDER"
       address_derivation:
         type: AssociatedTokenAccount
         owner: "USER_WALLET_PUBKEY"
-        mint: "9BEcn9aPEmhSPbPQeFGjidRiEKki46fVQDyPpSQXPA2D" # Solend USDC L-Token Mint
-      expected: 0
+        mint: "9BEcn9aPEmhSPbPQeFGjidRiEKki46fVQDyPpSQXPA2D" # jlUSDC mint
+      expected_lte: 5000000
       weight: 0.5
 
-    # The user's USDC balance should increase by ~50 USDC.
-    # The final balance should be >= 59 USDC (10 initial + 50 withdrawn - fees/slippage).
+    # The withdrawal is exact in USDC: 10 initial + 50 withdrawn = 60 USDC.
     - type: TokenAccountBalance
       pubkey: "UNUSED_PLACEHOLDER"
       address_derivation:
         type: AssociatedTokenAccount
         owner: "USER_WALLET_PUBKEY"
         mint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v" # USDC Mint
-      expected_gte: 59000000
+      expected: 60000000
       weight: 0.5
 
   # For this complex DeFi interaction, success is determined by the on-chain state assertions,

@@ -683,6 +683,8 @@ async fn run_flow_benchmark(
     let options =
         serde_json::to_value(test_case).context("Failed to serialize test case for env options")?;
     let mut initial_observation = env.reset(None, Some(options)).await?;
+    // Balance-change assertions compare the end of the flow with its start.
+    let flow_initial_observation = initial_observation.clone();
 
     // Execute each step in the flow
     for step in flow_steps.iter() {
@@ -734,7 +736,7 @@ async fn run_flow_benchmark(
     let score = calculate_final_score(
         test_case,
         &all_actions,
-        &initial_observation,
+        &flow_initial_observation,
         &final_observation,
     );
 
