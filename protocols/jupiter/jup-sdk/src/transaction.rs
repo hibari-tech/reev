@@ -107,3 +107,49 @@ pub fn compile_transaction(
         last_valid_block_height,
     })
 }
+
+/// Prepends idempotent ATA-creation instructions for any of the user's associated
+/// token accounts that the given instructions write to.
+///
+/// The Jupiter Lend API returns only the Lend program instruction and assumes the
+/// user's jlToken / underlying-asset ATAs already exist. On a fresh surfpool wallet
+/// they don't, which fails with `AccountNotInitialized` (0xbc4).
+pub fn with_user_atas(user_pubkey: &Pubkey, instructions: Vec<Instruction>) -> Vec<Instruction> {
+    let token_programs = [
+        "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+        "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+    ]
+    .map(|id| Pubkey::from_str(id).expect("valid token program id"));
+    let mut setup: Vec<Instruction> = Vec::new();
+    let mut seen: Vec<Pubkey> = Vec::new();
+    for ix in &instructions {
+        for target in ix.accounts.iter().filter(|a| a.is_writable && !a.is_signer) {
+            if seen.contains(&target.pubkey) {
+                continue;
+            }
+            'search: for mint in ix.accounts.iter().map(|a| a.pubkey) {
+                for program in &token_programs {
+                    let ata = spl_associated_token_account::get_associated_token_address_with_program_id(
+                        user_pubkey,
+                        &mint,
+                        program,
+                    );
+                    if ata == target.pubkey {
+                        setup.push(
+                            spl_associated_token_account::instruction::create_associated_token_account_idempotent(
+                                user_pubkey,
+                                user_pubkey,
+                                &mint,
+                                program,
+                            ),
+                        );
+                        seen.push(target.pubkey);
+                        break 'search;
+                    }
+                }
+            }
+        }
+    }
+    setup.extend(instructions);
+    setup
+}

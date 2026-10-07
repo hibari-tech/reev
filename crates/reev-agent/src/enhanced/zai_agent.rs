@@ -81,7 +81,7 @@ impl ZAIAgent {
         info!("[ZAIAgent] Starting ZAI completion request");
 
         // Create completion model using unified data
-        let model = client.completion_model(zai::GLM_4_6);
+        let model = client.completion_model(model_name);
 
         // Helper function to check if a tool is allowed
         let is_tool_allowed = |tool_name: &str| -> bool {

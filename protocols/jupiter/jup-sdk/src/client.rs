@@ -227,7 +227,10 @@ impl<'a> DepositBuilder<'a> {
     ) -> Result<(Vec<Instruction>, Vec<AddressLookupTableAccount>)> {
         let user_pubkey = self.client.get_user_pubkey()?;
         let api_response = api::lend::get_deposit_instructions(&user_pubkey, &self.params).await?;
-        let instructions = transaction::convert_instructions(api_response.instructions)?;
+        let instructions = transaction::with_user_atas(
+            &user_pubkey,
+            transaction::convert_instructions(api_response.instructions)?,
+        );
         Ok((instructions, vec![])) // Lend API does not use ALTs
     }
 
@@ -295,7 +298,10 @@ impl<'a> RedeemBuilder<'a> {
             self.params.amount,
         )
         .await?;
-        let instructions = transaction::convert_instructions(api_response.instructions)?;
+        let instructions = transaction::with_user_atas(
+            &user_pubkey,
+            transaction::convert_instructions(api_response.instructions)?,
+        );
         Ok((instructions, vec![])) // Lend API does not use ALTs
     }
 
@@ -380,7 +386,10 @@ impl<'a> WithdrawBuilder<'a> {
     ) -> Result<(Vec<Instruction>, Vec<AddressLookupTableAccount>)> {
         let user_pubkey = self.client.get_user_pubkey()?;
         let api_response = api::lend::get_withdraw_instructions(&user_pubkey, &self.params).await?;
-        let instructions = transaction::convert_instructions(api_response.instructions)?;
+        let instructions = transaction::with_user_atas(
+            &user_pubkey,
+            transaction::convert_instructions(api_response.instructions)?,
+        );
         Ok((instructions, vec![])) // Lend API does not use ALTs
     }
 
@@ -470,7 +479,10 @@ impl<'a> MintBuilder<'a> {
             self.params.amount,
         )
         .await?;
-        let instructions = transaction::convert_instructions(api_response.instructions)?;
+        let instructions = transaction::with_user_atas(
+            &user_pubkey,
+            transaction::convert_instructions(api_response.instructions)?,
+        );
         Ok((instructions, vec![])) // Lend API does not use ALTs
     }
 

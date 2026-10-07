@@ -639,7 +639,7 @@ pub async fn extract_execution_results(
         "[{agent_name}] Raw response (length: {}): {}",
         response_str.len(),
         if response_str.len() > 200 {
-            format!("{}...", &response_str[..200])
+            format!("{}...", response_str.chars().take(200).collect::<String>())
         } else {
             response_str.to_string()
         }
@@ -723,7 +723,7 @@ pub async fn extract_execution_results(
                     "JSON parsing failed: {}. Response may need manual review. Original response: {}",
                     e,
                     if response_str.len() > 200 {
-                        format!("{}...", &response_str[..200])
+                        format!("{}...", response_str.chars().take(200).collect::<String>())
                     } else {
                         response_str.to_string()
                     }
