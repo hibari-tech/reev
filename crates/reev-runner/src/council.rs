@@ -24,6 +24,9 @@ const USDC_MINT: &str = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
 const WSOL_MINT: &str = "So11111111111111111111111111111111111111112";
 const ATA_PROGRAM: &str = "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL";
 const JUPITER_LEND: &str = "jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9";
+/// Jupiter Lend receipt tokens: holding them is holding a lend position.
+const JL_SOL_MINT: &str = "2uQsyo1fXXQkDtcpXnLofWy88PxcvnfH2L8FPSE62FVU";
+const JL_USDC_MINT: &str = "9BEcn9aPEmhSPbPQeFGjidRiEKki46fVQDyPpSQXPA2D";
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Vote {
@@ -99,6 +102,17 @@ fn anchor_discriminator(name: &str) -> [u8; 8] {
     digest[..8].try_into().expect("8 bytes")
 }
 
+/// Human name and base-unit scale of a token mint the verifiers may meet.
+fn mint_info(mint: &str) -> Option<(&'static str, f64)> {
+    match mint {
+        USDC_MINT => Some(("USDC", 1e6)),
+        WSOL_MINT => Some(("wrapped SOL", 1e9)),
+        JL_SOL_MINT => Some(("jlSOL (Jupiter Lend SOL position)", 1e9)),
+        JL_USDC_MINT => Some(("jlUSDC (Jupiter Lend USDC position)", 1e6)),
+        _ => None,
+    }
+}
+
 fn asset_of(accounts: &[String]) -> (&'static str, f64) {
     if accounts.iter().any(|a| a == USDC_MINT) {
         ("USDC", 1e6)
@@ -107,6 +121,29 @@ fn asset_of(accounts: &[String]) -> (&'static str, f64) {
     } else {
         ("base units of the lent token", 1.0)
     }
+}
+
+/// The scenario role shown to verifiers for a key_map name: harness-only placeholders
+/// (`UNUSED_PLACEHOLDER`) are hidden and the `_PLACEHOLDER` suffix is dropped, so the
+/// council judges the transaction, not the test fixture's naming.
+fn role_name(name: &str) -> Option<String> {
+    if name.starts_with("UNUSED") {
+        return None;
+    }
+    Some(name.trim_end_matches("_PLACEHOLDER").to_string())
+}
+
+/// pubkey → role, choosing deterministically when several names share a pubkey.
+fn roles_by_pubkey(key_map: &HashMap<String, String>) -> HashMap<&str, String> {
+    let mut names: Vec<(&String, &String)> = key_map.iter().collect();
+    names.sort();
+    let mut by_pubkey: HashMap<&str, String> = HashMap::new();
+    for (name, key) in names {
+        if let Some(role) = role_name(name) {
+            by_pubkey.entry(key.as_str()).or_insert(role);
+        }
+    }
+    by_pubkey
 }
 
 fn describe_jupiter_lend(data: &[u8], raw_accounts: &[String], accounts: &[String]) -> Option<String> {
@@ -131,11 +168,8 @@ fn le_u64(bytes: &[u8]) -> Option<u64> {
 /// Decodes the proposed instructions into text a verifier can judge. Addresses are shown by
 /// their role in the scenario (e.g. USER_WALLET_PUBKEY) when known.
 pub fn describe(actions: &[AgentAction], key_map: &HashMap<String, String>) -> String {
-    let by_pubkey: HashMap<&str, &str> = key_map
-        .iter()
-        .map(|(name, key)| (key.as_str(), name.as_str()))
-        .collect();
-    let label = |k: &str| by_pubkey.get(k).map(|n| n.to_string()).unwrap_or_else(|| k.to_string());
+    let by_pubkey = roles_by_pubkey(key_map);
+    let label = |k: &str| by_pubkey.get(k).cloned().unwrap_or_else(|| k.to_string());
 
     actions
         .iter()
@@ -162,10 +196,12 @@ pub fn describe(actions: &[AgentAction], key_map: &HashMap<String, String>) -> S
                     )
                 }),
                 (JUPITER_LEND, _) => describe_jupiter_lend(&ix.data, &raw_accounts, &accounts),
+                // Accounts: payer, ata, owner, mint, system program, token program.
                 (ATA_PROGRAM, _) => Some(format!(
-                    "create the associated token account {} owned by {} (no funds move)",
+                    "create {}'s {} token account {} (no funds move)",
+                    accounts.get(2).cloned().unwrap_or_default(),
+                    raw_accounts.get(3).and_then(|m| mint_info(m)).map(|(n, _)| n).unwrap_or("associated"),
                     accounts.get(1).cloned().unwrap_or_default(),
-                    accounts.get(2).cloned().unwrap_or_default()
                 )),
                 (TOKEN_PROGRAM, Some(17)) => Some(format!(
                     "sync native SOL balance of {} (wrap SOL)",
@@ -216,16 +252,27 @@ pub fn refresh_balances(rpc: &RpcClient, observation: &AgentObservation) -> Agen
 }
 
 fn balances(observation: &AgentObservation) -> String {
-    let mut lines: Vec<String> = observation
-        .account_states
-        .iter()
-        .filter_map(|(name, state)| {
+    // One line per account: placeholders are hidden and a pubkey that several names share is
+    // reported once, under its role name.
+    let mut seen: std::collections::HashSet<&str> = std::collections::HashSet::new();
+    let mut names: Vec<&String> = observation.account_states.keys().collect();
+    names.sort();
+    let mut lines: Vec<String> = names
+        .into_iter()
+        .filter_map(|name| {
+            let state = &observation.account_states[name];
+            let role = role_name(name)?;
+            let pubkey = observation.key_map.get(name).map(String::as_str).unwrap_or(name);
+            if !seen.insert(pubkey) {
+                return None;
+            }
+            let name = role;
             // Token accounts: report the token balance, not the rent lamports.
             if let Some(amount) = state.get("amount").and_then(Value::as_u64) {
                 let mint = state.get("mint").and_then(Value::as_str).unwrap_or("");
-                return Some(match mint {
-                    USDC_MINT => format!("{name}: {} USDC ({amount} base units)", amount as f64 / 1e6),
-                    _ => format!("{name}: {amount} base units of token {mint}"),
+                return Some(match mint_info(mint) {
+                    Some((asset, scale)) => format!("{name}: {} {asset} ({amount} base units)", amount as f64 / scale),
+                    None => format!("{name}: {amount} base units of token {mint}"),
                 });
             }
             let lamports = state.get("lamports")?.as_u64()?;
@@ -421,6 +468,47 @@ mod tests {
         assert_eq!(
             balances(&obs),
             "USER_USDC_ATA: 10 USDC (10000000 base units)\nUSER_WALLET_PUBKEY: 1 SOL"
+        );
+    }
+
+    #[test]
+    fn placeholders_are_hidden_and_lend_positions_named() {
+        let ata = Pubkey::new_unique().to_string();
+        let obs = AgentObservation {
+            last_transaction_status: String::new(),
+            last_transaction_error: None,
+            last_transaction_logs: vec![],
+            account_states: HashMap::from([
+                ("USER_L_SOL_ATA_PLACEHOLDER".to_string(), json!({"amount": 100_000_000u64, "mint": JL_SOL_MINT, "lamports": 2_039_280u64})),
+                ("UNUSED_PLACEHOLDER".to_string(), json!({"amount": 100_000_000u64, "mint": JL_SOL_MINT, "lamports": 2_039_280u64})),
+                ("USER_WALLET_PUBKEY".to_string(), json!({"lamports": 5_000_000_000u64, "executable": false})),
+            ]),
+            key_map: HashMap::from([
+                ("USER_L_SOL_ATA_PLACEHOLDER".to_string(), ata.clone()),
+                ("UNUSED_PLACEHOLDER".to_string(), ata.clone()),
+                ("USER_WALLET_PUBKEY".to_string(), Pubkey::new_unique().to_string()),
+            ]),
+        };
+        assert_eq!(
+            balances(&obs),
+            "USER_L_SOL_ATA: 0.1 jlSOL (Jupiter Lend SOL position) (100000000 base units)\nUSER_WALLET_PUBKEY: 5 SOL"
+        );
+
+        // The same pubkey under two names is described by its role, never the placeholder.
+        let user = Pubkey::new_unique();
+        let ix = Instruction {
+            program_id: Pubkey::from_str(ATA_PROGRAM).unwrap(),
+            accounts: vec![
+                AccountMeta::new(user, true),
+                AccountMeta::new(Pubkey::from_str(&ata).unwrap(), false),
+                AccountMeta::new_readonly(user, false),
+                AccountMeta::new_readonly(Pubkey::from_str(JL_SOL_MINT).unwrap(), false),
+            ],
+            data: vec![1],
+        };
+        assert_eq!(
+            describe(&[AgentAction(ix)], &obs.key_map.iter().map(|(k, v)| (k.clone(), v.clone())).chain([("USER_WALLET_PUBKEY".to_string(), user.to_string())]).collect()),
+            "1. Associated Token Account — create USER_WALLET_PUBKEY's jlSOL (Jupiter Lend SOL position) token account USER_L_SOL_ATA (no funds move)"
         );
     }
 
