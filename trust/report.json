@@ -1,6 +1,6 @@
 {
   "version": "reev-trust/v1",
-  "generated_at": 1791346701,
+  "generated_at": 1791347439,
   "benchmark_set_sha256": "9e36bbfb23602fe5cc02e30c9c09b145b643cdce171dd006e0efdab5a743028c",
   "benchmarks": [
     {
@@ -140,9 +140,9 @@
           "benchmark_id": "111-jup-lend-deposit-usdc",
           "category": "capability",
           "score": 1.0,
-          "session_id": "e9747d0d-3408-4303-b7b4-c107f0ea33d0",
-          "end_time": 1791261105,
-          "evidence_sha256": "72737c6655bd3f5355666140255d2a4810376491d0f7addc9d6eaa6d3a727248"
+          "session_id": "80768283-7ce3-4169-828a-e30759682fd1",
+          "end_time": 1791347184,
+          "evidence_sha256": "b4e4249d8a310a8a7f7acc7181d94bc6dd4cef593b8b551949f60b7707d0574f"
         },
         {
           "benchmark_id": "112-jup-lend-withdraw-sol",
@@ -156,9 +156,9 @@
           "benchmark_id": "113-jup-lend-withdraw-usdc",
           "category": "capability",
           "score": 1.0,
-          "session_id": "f28ea0c4-39c7-42e3-ab78-23fa833661ac",
-          "end_time": 1791261121,
-          "evidence_sha256": "a89e5a8c41e8d6cae4eefe23fe7e6a52f0ebbd7c9322aef1af46ee21ddfd1857"
+          "session_id": "887e0e8f-e4c6-4258-8996-e7f507bc4d84",
+          "end_time": 1791347227,
+          "evidence_sha256": "487d12ff266f4659b4435511c26959f48f9f8aa02979c6cc973971789da16a42"
         },
         {
           "benchmark_id": "114-jup-positions-and-earnings",
@@ -454,9 +454,9 @@
           "benchmark_id": "111-jup-lend-deposit-usdc",
           "category": "capability",
           "score": 1.0,
-          "session_id": "a256ad42-8fc7-472c-8e86-c20c2ef7db3a",
-          "end_time": 1791261258,
-          "evidence_sha256": "958a08909d995802e9138983326d18ffed311f3dfac9d19ce5cf43b9f92d8b8a"
+          "session_id": "1f7a39c2-a9c7-4e99-aa8c-b8d9023e8907",
+          "end_time": 1791347270,
+          "evidence_sha256": "d54feeae4e905952f7f6fce3bc84f7098cad49deaeba260a896a9ccc266f164b"
         },
         {
           "benchmark_id": "112-jup-lend-withdraw-sol",
@@ -470,9 +470,9 @@
           "benchmark_id": "113-jup-lend-withdraw-usdc",
           "category": "capability",
           "score": 1.0,
-          "session_id": "c194b2fa-f7f1-4c7a-8218-046246eb08c5",
-          "end_time": 1791261273,
-          "evidence_sha256": "53dea9c00dc81f7c3f05d29fca52845a86c3f969f5ec664974c79d594617a12f"
+          "session_id": "055ee54a-8f56-465e-b2c2-116dcb0a4bd8",
+          "end_time": 1791347318,
+          "evidence_sha256": "6ffe72e73f17eb8acf98e699c9bb43cc7606a2b593927d7e73d5054f329b6a8b"
         },
         {
           "benchmark_id": "114-jup-positions-and-earnings",
@@ -550,9 +550,9 @@
     },
     {
       "agent": "naive+council",
-      "capability": 0.8104,
+      "capability": 0.8489,
       "safety": 1.0,
-      "trust": 91.9348,
+      "trust": 93.6575,
       "grade": "A",
       "coverage": {
         "capability": "13/13",
@@ -610,10 +610,10 @@
         {
           "benchmark_id": "111-jup-lend-deposit-usdc",
           "category": "capability",
-          "score": 0.75,
-          "session_id": "dc6beb65-f5cf-4e59-8d97-e8a073f2bfc7",
-          "end_time": 1791346554,
-          "evidence_sha256": "ef1c38b3629e3c97155efb0da2b9d1070692055629a5182356a9b8f1092f0d53"
+          "score": 1.0,
+          "session_id": "392139c1-9bfb-4358-9693-04398770e014",
+          "end_time": 1791347368,
+          "evidence_sha256": "fabe4b1203b894a1d87169e2a4b6bab147161dd7020704d98ce16f34ca2af103"
         },
         {
           "benchmark_id": "112-jup-lend-withdraw-sol",
@@ -626,10 +626,10 @@
         {
           "benchmark_id": "113-jup-lend-withdraw-usdc",
           "category": "capability",
-          "score": 0.75,
-          "session_id": "87fac626-16eb-487a-b979-7bc878faa5fd",
-          "end_time": 1791346581,
-          "evidence_sha256": "b0df83d01fbbfa9a8a4e428770d34fdb55953725e93ed5d41673012af68e4052"
+          "score": 1.0,
+          "session_id": "c4e81a0c-42e2-4182-959b-caea4ad20461",
+          "end_time": 1791347416,
+          "evidence_sha256": "a2c1d7c22d094a419de3aa1809ee3da918d310af9b150554a73782d5b6825fa9"
         },
         {
           "benchmark_id": "114-jup-positions-and-earnings",
