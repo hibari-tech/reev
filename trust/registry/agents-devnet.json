@@ -1,0 +1,61 @@
+{
+  "cluster": "devnet",
+  "agents": {
+    "deterministic": {
+      "asset": "6y7BL7Wdgt7o1RurGrF9bGwjzvoT1nX1gL491EGzjzVY",
+      "registerSignatures": [
+        "4tXe23FB3Ukv8nTY2xfi3JVwmh7pdKsPaJasogoPY2hxnHWvbh5rszu6mf4ahfx44PKTuLgSpyS2eemyzJNaLsPS"
+      ],
+      "feedback": {
+        "index": "0",
+        "signature": "46hagCiv7Y1m5JXF9qHBgsE8bR67onFdaNE19nbde7giTmFLgvonQNHUA1LvKdM2y9XkH6NxUzqomKB2QCGxCvSV",
+        "trust": 96.9632,
+        "grade": "A",
+        "reportSha256": "b89eb875348cf521b129e14b7dead8bbd442e4a69b802951868c3b937dc0b1a6",
+        "memoSignature": "5bu9gQHVU9vprhhu3GE1pqdy26DF3rDDCsymauAFTkbvw9h13Lm1d8nYzVQLnX45gc6UWw1PcX8kW4TGHqBp274f"
+      }
+    },
+    "glm-5.3": {
+      "asset": "Dy75NZysJkPga1YpR2XVDJFPgx4Jw6qBEHv6VSGdj66q",
+      "registerSignatures": [
+        "66ZeBGAhiqyv4J3CctF5z4Rc8RfMAEQT9EjYhBNtAuAuRbQqcoUas4cjjy6bZtNGCwi8XfzbBveG1wKdDH4hHWPT"
+      ],
+      "feedback": {
+        "index": "0",
+        "signature": "2LhtWouNUL12V8GUyaJXmK55zrEbkTJibE6AtpkhFp9DJr7kjXCoakws9vXoECGmkXBFRDDf9d4kW67F25sjCjqc",
+        "trust": 93.6575,
+        "grade": "A",
+        "reportSha256": "b89eb875348cf521b129e14b7dead8bbd442e4a69b802951868c3b937dc0b1a6",
+        "memoSignature": "5bxBgdXegyNQspiRpEM5NX17vjGtd3sPxRnNpJHNXW6ju631iuxBNPnWFKUnKZahJ6K9dMrsAyXn2qsfoi1HPY13"
+      }
+    },
+    "naive": {
+      "asset": "4Qu5HcVBTDMMoA4XC1NsqCSUgqMCzktbav1vujTXrZqr",
+      "registerSignatures": [
+        "2YoW58VeXmGzQx7o8hK5ZtZRaWtfS8AH2RtpoD7Vq5ZaTc4KNWNujQHCcL4FmfkY9LahSVVmUvVeD7uoX6ADapf1"
+      ],
+      "feedback": {
+        "index": "0",
+        "signature": "2m42ctFoJ2f9PZXst6CSd3BGQ8n3yETJm6mUci7nSVCN2Yvr2c5zDENttmt78sP41ENdwyP4S1ciWCYMNPGA8Q8k",
+        "trust": 16.069,
+        "grade": "D",
+        "reportSha256": "b89eb875348cf521b129e14b7dead8bbd442e4a69b802951868c3b937dc0b1a6",
+        "memoSignature": "5YEmk6Gxd9TqdgaQ5TDuUYtiYemJV8rstEEDSkmdxx6AqdemNDQazZRGC9xQbfZ4jQ6PEMpszK68YF9XihANUX66"
+      }
+    },
+    "naive+council": {
+      "asset": "DUKW6Zg6zhs3z72GfnE8ReKDdEJKdVLGrAavRTVuM116",
+      "registerSignatures": [
+        "2FTdAqjdTANXm5E3FZESQQxARVU3hHAqCvTVnPDMMiyq6Y7cG1tyTDoWkFErHeSTE4Yf6HcztcFM3AykyhVA3pqn"
+      ],
+      "feedback": {
+        "index": "0",
+        "signature": "37BGTC3VyTqy9akgT8MpUCfsqsdGxMnZEA6Bs9M1xThuyPbq9Yrt9ri7gWbrcsL92QaZeMUbGpxoL9BjTx82paNR",
+        "trust": 93.6575,
+        "grade": "A",
+        "reportSha256": "b89eb875348cf521b129e14b7dead8bbd442e4a69b802951868c3b937dc0b1a6",
+        "memoSignature": "5op4aUdkBJRNtLap3mSMc7qMhNDWjUsBHCdJDAsnU6gTfmdxHDCV7yswpNzqq3Rhky6camMERVRrzPcFsCCZUP5v"
+      }
+    }
+  }
+}
