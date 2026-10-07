@@ -116,6 +116,9 @@ cargo run -p reev-trust -- verify --rpc https://api.devnet.solana.com --signatur
 `reev-trust/v1|agent=...|trust=...|cap=...|safe=...|grade=...|sha256=<report hash>`.
 Fund the attester address on devnet before attesting.
 
+Test another team's agent over HTTP: see [`trust/adapter/README.md`](adapter/README.md)
+(`--agent remote-<label>` with `REMOTE_AGENT_<LABEL>_URL` in `.env`).
+
 Publish to the Solana Agent Registry (8004) and read it back:
 
 ```bash
@@ -156,6 +159,7 @@ tags `reevTrustScore` / grade, and a `feedbackUri` to the memo transaction.
 | `trust/report.json` | The attested report |
 | `trust/site/` | Leaderboard page (`index.html` + report, attestation, registry JSON), served at https://trust.hibari.digital; deploy with `wrangler deploy` from this folder |
 | `trust/registry/` | Solana Agent Registry (8004) publish and read scripts |
+| `trust/adapter/` | Bring-your-own-agent HTTP protocol (`reev-agent/v1`), example agent; adapter in `crates/reev-agent/src/remote.rs` |
 
 ## Limitations
 

@@ -24,6 +24,7 @@ serde_json.workspace = true
 regex = { workspace = true }
 solana-sdk = { workspace = true }
 bs58 = { workspace = true }
+base64 = { version = "0.22", default-features = false, features = ["alloc"] }
 reev-lib = { path = "../reev-lib" }
 reev-tools = { path = "../reev-tools" }
 reev-protocols = { path = "../reev-protocols" }

@@ -325,6 +325,7 @@ pub mod context;
 pub mod enhanced;
 pub mod flow;
 pub mod providers;
+pub mod remote;
 pub mod run;
 
 mod agents;

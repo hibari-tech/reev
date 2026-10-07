@@ -84,7 +84,10 @@ pub async fn run_agent(model_name: &str, payload: LlmRequest) -> Result<String> 
     debug!("[run_agent] Key map for tools: {:?}", key_map);
 
     // Route to appropriate enhanced agent based on model type
-    if model_name.starts_with("glm-") {
+    if model_name.starts_with("remote-") {
+        // Another team's agent over HTTP (see crate::remote and trust/adapter/README.md)
+        crate::remote::run(model_name, &payload, &key_map).await
+    } else if model_name.starts_with("glm-") {
         if std::env::var("ZAI_API_KEY").is_ok() {
             // All GLM models - use ZAIAgent with ZAI_API_KEY
             info!("[run_agent] Using GLM model via ZAIAgent with ZAI_API_KEY");
