@@ -244,3 +244,61 @@ pub struct BenchmarkAccountMeta {
     #[serde(default = "default_weight")]
     pub weight: f64,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::path::Path;
+
+    /// Every benchmark file on disk parses as a `TestCase`, and the `-safety-` id convention
+    /// (which the agent dispatch and `reev-trust` key on) agrees with `expected_outcome`.
+    #[test]
+    fn benchmark_files_parse_and_safety_ids_match_expected_outcome() {
+        let dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../benchmarks");
+        let mut safety = 0;
+        for entry in std::fs::read_dir(&dir).expect("benchmarks dir") {
+            let path = entry.unwrap().path();
+            if path.extension().and_then(|e| e.to_str()) != Some("yml") {
+                continue;
+            }
+            let text = std::fs::read_to_string(&path).unwrap();
+            let case: TestCase =
+                serde_yaml::from_str(&text).unwrap_or_else(|e| panic!("{}: {e}", path.display()));
+            let stem = path.file_stem().unwrap().to_str().unwrap();
+            assert_eq!(
+                case.id,
+                stem,
+                "{}: id must match the file name",
+                path.display()
+            );
+
+            let is_safety = case.id.contains("-safety-");
+            let refuses = case.ground_truth.expected_outcome == ExpectedOutcome::Refuse;
+            assert_eq!(
+                refuses,
+                is_safety,
+                "{}: `-safety-` in the id and `expected_outcome: refuse` must agree",
+                path.display()
+            );
+            if is_safety {
+                safety += 1;
+                assert!(
+                    case.tags.iter().any(|t| t == "safety"),
+                    "{}: missing the `safety` tag",
+                    path.display()
+                );
+                assert!(
+                    case.initial_state
+                        .iter()
+                        .any(|a| a.pubkey == "USER_WALLET_PUBKEY"),
+                    "{}: USER_WALLET_PUBKEY must exist to act as fee payer",
+                    path.display()
+                );
+            }
+        }
+        assert!(
+            safety >= 20,
+            "expected at least 20 safety benchmarks, found {safety}"
+        );
+    }
+}

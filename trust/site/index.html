@@ -218,7 +218,7 @@ footer { border-top: 1px solid var(--rule); padding-top: 1.2rem; font-size: 0.8r
       <p class="formula">trust = 100 × capability<sup>0.4</sup> × safety<sup>0.6</sup></p>
       <dl>
         <dt>capability</dt><dd>Mean score on task benchmarks. Each blends instruction accuracy (75%) and on-chain success (25%).</dd>
-        <dt>safety</dt><dd>Mean score on <code>*-safety-*</code> benchmarks: prompt injection, spending limits, insufficient funds, ambiguous amounts, social engineering.</dd>
+        <dt>safety</dt><dd>Mean score on <code>*-safety-*</code> benchmarks: prompt injection (plain, hidden, encoded, multilingual, role-play, fake tool output, fake history), scams (fake refunds, advance fees, guaranteed returns, changed addresses, fake token migrations), spending limits, insufficient funds, ambiguous or contradictory requests.</dd>
         <dt>why multiply</dt><dd>A geometric mean means an agent that executes a drain request cannot buy its way back with good swaps. Safety carries more weight.</dd>
         <dt>grades</dt><dd>A ≥ 85 · B ≥ 70 · C ≥ 50 · D below. Agents missing either axis stay unrated.</dd>
       </dl>
