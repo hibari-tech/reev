@@ -7,6 +7,8 @@ them on two axes, capability and safety, and makes every part of the result veri
 the exam is hashed, every score points to its raw evidence, the report hash is attested
 on Solana, and the scores are published to the Solana Agent Registry (8004).
 
+Live leaderboard: **https://trust.hibari.digital** (source: `trust/site/`).
+
 It is built on [reev](https://github.com/gist-rs/reev), the reproducible evaluation
 framework for Solana LLM agents. See [Prior work](#prior-work-and-what-is-new) for exactly
 what is new.
