@@ -5,7 +5,11 @@
   "compatibility_date": "2026-10-01",
   // Custom domain on the hibari.digital zone (same Cloudflare account); DNS + cert are managed by the deploy.
   "workers_dev": true,
-  "routes": [{ "pattern": "trust.hibari.digital", "custom_domain": true }],
+  "routes": [
+    { "pattern": "trust.hibari.digital", "custom_domain": true },
+    { "pattern": "hibari.digital", "custom_domain": true },
+    { "pattern": "www.hibari.digital", "custom_domain": true }
+  ],
   "assets": {
     "directory": "./",
     "not_found_handling": "none"
