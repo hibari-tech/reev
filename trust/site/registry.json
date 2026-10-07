@@ -7,23 +7,28 @@
   "agents": {
     "deterministic": {
       "asset": "6y7BL7Wdgt7o1RurGrF9bGwjzvoT1nX1gL491EGzjzVY",
-      "feedbackSignature": "46hagCiv7Y1m5JXF9qHBgsE8bR67onFdaNE19nbde7giTmFLgvonQNHUA1LvKdM2y9XkH6NxUzqomKB2QCGxCvSV",
+      "feedbackSignature": "2G8uZ13YGrRwGGdrxspMXaVwE9kgNcFYPZpdSp2zMaom1CnjtGUawRNKjhh5GvbZbJ78qUK6w6vwYuMFWVHwnHNS",
       "value": 96.9632
     },
     "glm-5.3": {
       "asset": "Dy75NZysJkPga1YpR2XVDJFPgx4Jw6qBEHv6VSGdj66q",
-      "feedbackSignature": "2LhtWouNUL12V8GUyaJXmK55zrEbkTJibE6AtpkhFp9DJr7kjXCoakws9vXoECGmkXBFRDDf9d4kW67F25sjCjqc",
+      "feedbackSignature": "3XCTq1TCnJ15v5nwjiACy5Sa3cfVzwFxZuf5RL9zB1BKTJvba4XaKwC1kHsp38Aod5HLRX5skWafgNjVtPYK1YhR",
       "value": 93.6575
     },
     "naive": {
       "asset": "4Qu5HcVBTDMMoA4XC1NsqCSUgqMCzktbav1vujTXrZqr",
-      "feedbackSignature": "2m42ctFoJ2f9PZXst6CSd3BGQ8n3yETJm6mUci7nSVCN2Yvr2c5zDENttmt78sP41ENdwyP4S1ciWCYMNPGA8Q8k",
+      "feedbackSignature": "2igPh3kU3y6c8SaZouAsqHt6p91ADeBQW7AeZ2i6U11tTGSaBQgVhoKFhtgcyDLhd5xGtbNEu2nbek2wUpzof6Cm",
       "value": 16.069
     },
     "naive+council": {
       "asset": "DUKW6Zg6zhs3z72GfnE8ReKDdEJKdVLGrAavRTVuM116",
-      "feedbackSignature": "37BGTC3VyTqy9akgT8MpUCfsqsdGxMnZEA6Bs9M1xThuyPbq9Yrt9ri7gWbrcsL92QaZeMUbGpxoL9BjTx82paNR",
+      "feedbackSignature": "4fX11GG81DXsyymKhrkCV72kJMx5tHChEhFGf3vN3iAmFSygLPWSMRsHnAxAPXaN2oFTAp5VhLWQLn5wYJhD7jMg",
       "value": 93.6575
+    },
+    "glm-5.3+council": {
+      "asset": "2CNe3eCZyKEpU54b8CwpquV4BFsZj5dRzJFXsCHH2wpT",
+      "feedbackSignature": "5FRLwVJRtz6QRoTQqbAz1ccebXhsfaQwnnnPp9gUvidvMoxcN9bQghteDUrKPNZ6aZgamxTfYQbNxSsBiKDsddMq",
+      "value": 94.4992
     }
   }
 }

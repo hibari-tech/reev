@@ -1,5 +1,5 @@
 {
-  "sha256": "b89eb875348cf521b129e14b7dead8bbd442e4a69b802951868c3b937dc0b1a6",
+  "sha256": "7c959bd2c5e06b8bb04475eb9ba32a3bf330775b9677fbe11063b4470c3e2266",
   "cluster": "Solana devnet",
   "rpc": "https://api.devnet.solana.com",
   "attester": "HNKyE1jzmwNfZ5rGX9toZqXfjW2EvsuQETwnDmocW7d1",
@@ -7,19 +7,23 @@
   "signatures": [
     {
       "agent": "deterministic",
-      "signature": "5bu9gQHVU9vprhhu3GE1pqdy26DF3rDDCsymauAFTkbvw9h13Lm1d8nYzVQLnX45gc6UWw1PcX8kW4TGHqBp274f"
+      "signature": "2TjsbX3JmNg1r8pdBi1xDoXWa3ceVg5XLgVgNKJxd7XiaH1U1YoMGP33y5MFPMHSHnY6mRmS1b8pSMSMErYFL9un"
     },
     {
       "agent": "glm-5.3",
-      "signature": "5bxBgdXegyNQspiRpEM5NX17vjGtd3sPxRnNpJHNXW6ju631iuxBNPnWFKUnKZahJ6K9dMrsAyXn2qsfoi1HPY13"
+      "signature": "3V1y1dzNXdn71GfdKgGr3z44aokG7Ly8ci3B8s94Bx23yCBCDe7QjE912m7EshjFwjZ9Hw99gopEPiNwXJqPLVLs"
+    },
+    {
+      "agent": "glm-5.3+council",
+      "signature": "5Hr3Ys2Qyh6D2PqZFx4TdawJiqz51pXrCvcrAdBZWgESQdY2jy1wPZFu3bN9UV7yBroERz1HrCQgePynkHFKen3U"
     },
     {
       "agent": "naive",
-      "signature": "5YEmk6Gxd9TqdgaQ5TDuUYtiYemJV8rstEEDSkmdxx6AqdemNDQazZRGC9xQbfZ4jQ6PEMpszK68YF9XihANUX66"
+      "signature": "34QYDVn2mUbgFgCEKestTk9dLKZ3E8z1XqCiyUTpw2uocCNno1CnFSethHFuJb8TWSc4enwVCZ3p5FrSWZcUseTJ"
     },
     {
       "agent": "naive+council",
-      "signature": "5op4aUdkBJRNtLap3mSMc7qMhNDWjUsBHCdJDAsnU6gTfmdxHDCV7yswpNzqq3Rhky6camMERVRrzPcFsCCZUP5v"
+      "signature": "5Zois5VgaZERVWnMBmmjwgC1s9TCrNteyy6G17Gtntsax7XShYYkaoWCM64LvSjWprTrJwv8iVjnvpuzUa393NQN"
     }
   ]
 }
