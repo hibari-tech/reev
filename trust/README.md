@@ -154,7 +154,7 @@ tags `reevTrustScore` / grade, and a `feedbackUri` to the memo transaction.
 | `crates/reev-lib/src/score.rs` | Refusal scoring |
 | `crates/reev-agent/src/agents/coding/d_300_naive_comply.rs` | `naive` baseline |
 | `trust/report.json` | The attested report |
-| `trust/site/` | Leaderboard page (`index.html` + report, attestation, registry JSON) |
+| `trust/site/` | Leaderboard page (`index.html` + report, attestation, registry JSON), served at https://trust.hibari.digital; deploy with `wrangler deploy` from this folder |
 | `trust/registry/` | Solana Agent Registry (8004) publish and read scripts |
 
 ## Limitations
