@@ -1,5 +1,7 @@
 # reev 🪸
 
+> **This fork adds [Agent Trust Score](trust/README.md)**: safety benchmarks, a verifier council, and verifiable scores attested on Solana and published to the Solana Agent Registry.
+
 **Reev 🪸: Production-Ready Framework for Solana LLM Agent Evaluation**
 
 ---
