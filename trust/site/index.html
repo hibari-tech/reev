@@ -124,12 +124,22 @@ dd { margin: 0; color: var(--soft); }
 .proof { display: grid; gap: 1rem; }
 .box { padding: 0.9rem 1rem; border: 1px solid var(--rule); border-radius: 12px; }
 pre { margin: 0; padding: 0.9rem 1rem; border: 1px solid var(--rule); border-radius: 12px; font: 400 0.75rem/1.6 var(--mono); color: var(--soft); overflow-x: auto; }
-.sigs { display: grid; gap: 0.55rem; font-size: 0.85rem; }
-.sigs p { margin: 0; color: var(--muted); }
-.sig { display: grid; gap: 0.15rem; }
-.sig a { text-decoration: none; }
-.sig a:hover code { color: var(--ink); }
-.sig code { font-size: 0.7rem; color: var(--muted); overflow-wrap: anywhere; }
+/* Ledger: one row per agent, memo attestation and registry feedback side by side. Signatures
+   are shortened to head…tail; the full value sits in the title and behind the Explorer link. */
+.ledger { display: grid; gap: 0.6rem; font-size: 0.85rem; }
+.ledger p { margin: 0; color: var(--muted); }
+.ledger .scroll { overflow-x: auto; }
+.ledger table { width: 100%; min-width: 26rem; border-collapse: collapse; }
+.ledger th { padding: 0 0 0.45rem; text-align: left; font: 500 0.68rem/1.2 var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--rule); }
+.ledger td { padding: 0.55rem 0; border-bottom: 1px solid var(--rule); vertical-align: middle; }
+.ledger td.name { font: 500 0.85rem/1.2 var(--mono); }
+.ledger td.val { font: 400 0.82rem/1 var(--mono); font-variant-numeric: tabular-nums; color: var(--soft); white-space: nowrap; }
+.ledger th + th, .ledger td + td { padding-left: 1rem; }
+.tx { display: inline-flex; align-items: center; gap: 0.35rem; font: 400 0.74rem/1 var(--mono); color: var(--soft); text-decoration: none; white-space: nowrap; }
+.tx::after { content: "↗"; font-size: 0.7em; color: var(--muted); }
+.tx:hover { color: var(--purple); }
+.tx:hover::after { color: var(--purple); }
+.ledger .muted { color: var(--muted); }
 footer { border-top: 1px solid var(--rule); padding-top: 1.2rem; font-size: 0.8rem; color: var(--muted); }
 .status { color: var(--muted); }
 @media (prefers-reduced-motion: no-preference) { .ribbon path { animation: drift 14s ease-in-out infinite alternate; } }
@@ -147,12 +157,10 @@ footer { border-top: 1px solid var(--rule); padding-top: 1.2rem; font-size: 0.8r
           <stop offset="1" stop-color="#14f195"/>
         </linearGradient>
         <filter id="glow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="9"/></filter>
-        <filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="1.6" numOctaves="2" seed="4"/><feColorMatrix values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.09 0"/><feComposite operator="in" in2="SourceGraphic"/></filter>
       </defs>
       <path d="M-20 430 C 180 400, 260 120, 470 170 S 700 330, 800 60" fill="none" stroke="url(#rg)" stroke-width="44" stroke-linecap="round" filter="url(#glow)" opacity="0.55"/>
       <path d="M-20 430 C 180 400, 260 120, 470 170 S 700 330, 800 60" fill="none" stroke="url(#rg)" stroke-width="3"/>
       <path d="M-20 458 C 200 420, 280 150, 480 200 S 710 360, 800 92" fill="none" stroke="url(#rg)" stroke-width="1" opacity="0.6"/>
-      <rect width="760" height="520" fill="#fff" filter="url(#grain)" opacity="0.5"/>
     </svg>
     <div class="eyebrow">Agent Trust Score · built on Solana</div>
     <h1>Before an agent holds money, <span class="light">it sits an exam.</span></h1>
@@ -219,8 +227,7 @@ footer { border-top: 1px solid var(--rule); padding-top: 1.2rem; font-size: 0.8r
       <h2>On-chain <span class="light">proof</span></h2>
       <p class="note" style="margin:0">SHA-256 of this report's canonical JSON:</p>
       <div class="box hash" id="hash">–</div>
-      <div class="sigs" id="sigs"></div>
-      <div class="sigs" id="registry"></div>
+      <div class="ledger" id="ledger"></div>
       <pre id="verify">cargo run -p reev-trust -- verify --signature &lt;sig&gt;</pre>
     </div>
   </section>
@@ -290,28 +297,37 @@ function grid(report) {
   document.getElementById("grid").innerHTML = head + `<tbody>${body}</tbody>`;
 }
 
-function proof(att) {
+const short = (sig) => `${sig.slice(0, 6)}…${sig.slice(-6)}`;
+const txLink = (url, sig) => url
+  ? `<a class="tx" href="${esc(url.replace("{sig}", sig))}" target="_blank" rel="noopener" title="${esc(sig)}">${esc(short(sig))}</a>`
+  : `<span class="tx" title="${esc(sig)}">${esc(short(sig))}</span>`;
+
+/* One ledger for both proofs: the memo attestation and the registry feedback, per agent. */
+function proof(att, reg) {
   if (!att) return;
   document.getElementById("hash").textContent = att.sha256;
   if (!att.signatures?.length) return;
-  document.getElementById("sigs").innerHTML = `<p>Attested on <strong>${esc(att.cluster)}</strong> via the Memo program:</p>` +
-    att.signatures.map(s => {
-      const sig = att.explorer
-        ? `<a href="${esc(att.explorer.replace("{sig}", s.signature))}" target="_blank" rel="noopener"><code>${esc(s.signature)}</code></a>`
-        : `<code>${esc(s.signature)}</code>`;
-      return `<div class="sig"><span>${esc(s.agent)}</span>${sig}</div>`;
-    }).join("");
+  const feedback = reg?.agents ?? {};
+  const rows = att.signatures.map(s => {
+    const f = feedback[s.agent];
+    return `<tr>
+      <td class="name">${esc(s.agent)}</td>
+      <td>${txLink(att.explorer, s.signature)}</td>
+      <td class="val">${f ? Number(f.value).toFixed(2) : '<span class="muted">–</span>'}</td>
+      <td>${f ? txLink(reg.tx, f.feedbackSignature) : '<span class="muted">not published</span>'}</td>
+    </tr>`;
+  }).join("");
+  const regNote = reg
+    ? ` Scores are published as feedback to the <strong>${esc(reg.registry)}</strong> from evaluator <code>${esc(reg.evaluator.slice(0, 8))}…</code>.`
+    : "";
+  document.getElementById("ledger").innerHTML =
+    `<p>Each agent's score is attested on <strong>${esc(att.cluster)}</strong> via the Memo program.${regNote}</p>
+    <div class="scroll"><table>
+      <thead><tr><th>Agent</th><th>Memo attestation</th><th>Score</th><th>Registry feedback</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>`;
   document.getElementById("verify").textContent =
     `cargo run -p reev-trust -- verify --rpc ${att.rpc} \\\n  --signature ${att.signatures[0].signature}`;
-}
-
-function registry(reg) {
-  if (!reg) return;
-  const rows = Object.entries(reg.agents).map(([name, e]) => `
-    <div class="sig"><span>${esc(name)} · ${Number(e.value).toFixed(2)}</span>
-      <a href="${esc(reg.tx.replace("{sig}", e.feedbackSignature))}" target="_blank" rel="noopener"><code>${esc(e.feedbackSignature)}</code></a></div>`).join("");
-  document.getElementById("registry").innerHTML =
-    `<p>Published as feedback to the <strong>${esc(reg.registry)}</strong> on ${esc(reg.cluster)}, from evaluator <code>${esc(reg.evaluator.slice(0, 8))}…</code>:</p>` + rows;
 }
 
 Promise.all([
@@ -319,7 +335,7 @@ Promise.all([
   fetch("attestation.json").then(r => r.ok ? r.json() : null).catch(() => null),
   fetch("registry.json").then(r => r.ok ? r.json() : null).catch(() => null),
 ]).then(([report, att, reg]) => {
-  figures(report, att); board(report, reg); grid(report); proof(att); registry(reg);
+  figures(report, att); board(report, reg); grid(report); proof(att, reg);
   document.getElementById("bench-hash").textContent =
     report.benchmark_set_sha256 ? `${report.benchmarks.length} benchmarks · ${report.benchmark_set_sha256}` : "–";
   if (att) document.getElementById("hash-mini").textContent = att.sha256;
