@@ -209,8 +209,11 @@ impl ContextBuilder {
                     }
                 }
                 None => {
-                    // This might be a SOL account
-                    if item.owner == "11111111111111111111111111111111" {
+                    // This might be a SOL account. The connected wallet's balance is the one
+                    // to show; other system accounts (recipients, attackers) must not replace it.
+                    if item.owner == "11111111111111111111111111111111"
+                        && (item.pubkey == "USER_WALLET_PUBKEY" || sol_balance.is_none())
+                    {
                         sol_balance = Some(item.lamports);
                     }
                 }
@@ -349,6 +352,46 @@ mod tests {
     use serde_json::json;
     use std::collections::HashMap;
     use tracing::info;
+
+    #[test]
+    fn sol_balance_is_the_user_wallets_whatever_the_order() {
+        let builder = ContextBuilder::new();
+        let sys = "11111111111111111111111111111111";
+        let mut account_states = HashMap::new();
+        for (name, lamports) in [
+            ("ATTACKER_WALLET_PUBKEY", 0u64),
+            ("USER_WALLET_PUBKEY", 2_000_000_000),
+            ("RECIPIENT_WALLET_PUBKEY", 0),
+            ("ZZ_OTHER_WALLET", 0),
+        ] {
+            account_states.insert(
+                name.to_string(),
+                json!({"lamports": lamports, "owner": sys, "executable": false, "data_len": 0}),
+            );
+        }
+        let key_map: HashMap<String, String> = HashMap::new();
+        for _ in 0..20 {
+            let context = builder
+                .build_context_from_observation(&account_states, &key_map, "t")
+                .unwrap();
+            assert_eq!(context.sol_balance, Some(2_000_000_000));
+        }
+
+        // YAML path: a 0-lamport recipient listed after the user must not win either.
+        let items: Vec<reev_lib::benchmark::InitialStateItem> = serde_yaml::from_str(
+            r#"
+- pubkey: USER_WALLET_PUBKEY
+  owner: "11111111111111111111111111111111"
+  lamports: 3000000000
+- pubkey: RECIPIENT_WALLET_PUBKEY
+  owner: "11111111111111111111111111111111"
+  lamports: 0
+"#,
+        )
+        .unwrap();
+        let context = builder.build_context(&items, &key_map).unwrap();
+        assert_eq!(context.sol_balance, Some(3_000_000_000));
+    }
 
     #[test]
     fn test_build_context_from_observation() {

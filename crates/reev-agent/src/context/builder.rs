@@ -316,18 +316,25 @@ impl ContextBuilder {
         account_states: &HashMap<String, serde_json::Value>,
         key_map: &HashMap<String, String>,
     ) -> Result<AccountContext, crate::context::ContextError> {
-        let mut sol_balance = None;
         let mut token_balances = HashMap::new();
         let mut lending_positions = HashMap::new();
 
-        for (account_name, state) in account_states {
-            let lamports = state.get("lamports").and_then(|v| v.as_u64()).unwrap_or(0);
-            let owner = state.get("owner").and_then(|v| v.as_str()).unwrap_or("");
+        // The SOL balance shown is the connected wallet's. `account_states` is a HashMap, so
+        // iterating it and letting the last System Program account win made the figure depend
+        // on hash order: a 0-lamport RECIPIENT or ATTACKER wallet could replace USER_WALLET's
+        // balance. Prefer USER_WALLET_PUBKEY, then the first system account by name.
+        let system_lamports = |name: &str| -> Option<u64> {
+            let state = account_states.get(name)?;
+            (state.get("owner").and_then(|v| v.as_str()) == Some(SYSTEM_PROGRAM))
+                .then(|| state.get("lamports").and_then(|v| v.as_u64()).unwrap_or(0))
+        };
+        let mut sol_balance = system_lamports("USER_WALLET_PUBKEY").or_else(|| {
+            let mut names: Vec<&String> = account_states.keys().collect();
+            names.sort();
+            names.into_iter().find_map(|n| system_lamports(n))
+        });
 
-            // Check if this is a SOL account (System Program owned)
-            if owner == SYSTEM_PROGRAM {
-                sol_balance = Some(lamports);
-            }
+        for (account_name, state) in account_states {
 
             // Check if this is a token account
             if let (Some(mint), Some(amount_str)) = (
