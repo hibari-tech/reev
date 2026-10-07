@@ -1,0 +1,19 @@
+[package]
+name = "reev-trust"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Agent Trust Score: aggregates reev benchmark sessions into a capability/safety score and attests it on Solana."
+
+[[bin]]
+name = "reev-trust"
+path = "src/main.rs"
+
+[dependencies]
+anyhow = { workspace = true }
+clap = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+solana-client = { workspace = true }
+solana-sdk = { workspace = true }
+sha2 = "0.10"

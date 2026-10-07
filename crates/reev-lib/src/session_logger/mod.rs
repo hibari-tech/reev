@@ -621,3 +621,58 @@ pub fn convert_legacy_flow_event(legacy_event: &serde_json::Value) -> Result<Ses
         data,
     })
 }
+
+/// Overwrites the trace-derived score in a completed session log with the benchmark's real score.
+///
+/// `complete_with_trace` only knows whether a transaction succeeded, so it records 0/1. Partial
+/// credit and refusal benchmarks (where submitting nothing is the correct answer) need the score
+/// from `calculate_final_score`, which downstream consumers such as the trust report read.
+pub fn set_final_score(log_file: &std::path::Path, score: f64) -> Result<()> {
+    let text = std::fs::read_to_string(log_file)
+        .with_context(|| format!("Failed to read session log: {log_file:?}"))?;
+    let mut log: serde_json::Value = serde_json::from_str(&text)?;
+    if let Some(result) = log.get_mut("final_result").and_then(|r| r.as_object_mut()) {
+        result.insert("score".into(), json!(score));
+        result.insert("success".into(), json!(score > 0.0));
+        let status = if score > 0.0 { "Succeeded" } else { "Failed" };
+        result.insert("status".into(), json!(status));
+    }
+    std::fs::write(log_file, serde_json::to_vec_pretty(&log)?)
+        .with_context(|| format!("Failed to write session log: {log_file:?}"))?;
+    Ok(())
+}
+
+/// Writes a minimal session log for runs that are recorded elsewhere (flow benchmarks log to
+/// `logs/flows`), so every benchmark has a `logs/sessions/session_<id>.json` with its real score.
+pub fn write_summary_session_log(
+    sessions_dir: &Path,
+    session_id: &str,
+    benchmark_id: &str,
+    agent_type: &str,
+    score: f64,
+) -> Result<PathBuf> {
+    std::fs::create_dir_all(sessions_dir)?;
+    let now = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_secs();
+    let log = json!({
+        "session_id": session_id,
+        "benchmark_id": benchmark_id,
+        "agent_type": agent_type,
+        "start_time": now,
+        "end_time": now,
+        "events": [],
+        "final_result": {
+            "success": score > 0.0,
+            "score": score,
+            "status": if score > 0.0 { "Succeeded" } else { "Failed" },
+            "execution_time_ms": 0,
+            "data": { "kind": "flow" }
+        }
+    });
+    let path = sessions_dir.join(format!("session_{session_id}.json"));
+    std::fs::write(&path, serde_json::to_vec_pretty(&log)?)
+        .with_context(|| format!("Failed to write session log: {path:?}"))?;
+    Ok(path)
+}

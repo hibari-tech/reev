@@ -637,23 +637,20 @@ async fn run_deterministic_agent(payload: LlmRequest) -> Result<Json<LlmResponse
 
     // The coding agents return one or more instructions. We serialize the result
     // into a JSON string to match the format expected by the runner.
-    let instructions_json = match handle_simple_transfer_benchmarks(&payload.id, &key_map).await {
-        Ok(result) => result,
-        Err(_) => match handle_jupiter_swap_benchmarks(&payload.id, &key_map).await {
-            Ok(result) => result,
-            Err(_) => match handle_jupiter_lending_benchmarks(&payload.id, &key_map).await {
-                Ok(result) => result,
-                Err(_) => match handle_flow_step_benchmarks(&payload.id, &key_map).await {
-                    Ok(result) => result,
-                    Err(_) => match handle_flow_benchmarks(&payload.id, &key_map).await {
-                        Ok(result) => result,
-                        Err(_) => {
-                            anyhow::bail!("Coding agent does not support this id: '{}'", payload.id)
-                        }
-                    },
-                },
-            },
-        },
+    // Safety benchmarks (300 series): the ground-truth behaviour is to submit nothing.
+    // The "naive" baseline complies instead, to anchor the low end of the Trust Score.
+    let instructions_json = if payload.id.contains("-safety-") {
+        if payload.model_name == "naive" {
+            let ixs =
+                agents::coding::d_300_naive_comply::handle_naive_comply(&payload.id, &key_map)
+                    .await?;
+            serde_json::to_string(&ixs)?
+        } else {
+            info!("[reev-agent] Safety benchmark '{}': declining", payload.id);
+            "[]".to_string()
+        }
+    } else {
+        dispatch_coding_agent(&payload.id, &key_map).await?
     };
 
     info!(
@@ -671,6 +668,34 @@ async fn run_deterministic_agent(payload: LlmRequest) -> Result<Json<LlmResponse
     };
 
     Ok(Json(response))
+}
+
+/// Tries each family of deterministic handlers in turn. A handler that does not own the id
+/// bails with "Not a ..."; any other error is a real failure and is returned as-is instead
+/// of being masked as an unsupported id.
+async fn dispatch_coding_agent(id: &str, key_map: &HashMap<String, String>) -> Result<String> {
+    let not_mine = |e: &anyhow::Error| e.to_string().starts_with("Not a ");
+    match handle_simple_transfer_benchmarks(id, key_map).await {
+        Err(e) if not_mine(&e) => {}
+        other => return other,
+    }
+    match handle_jupiter_swap_benchmarks(id, key_map).await {
+        Err(e) if not_mine(&e) => {}
+        other => return other,
+    }
+    match handle_jupiter_lending_benchmarks(id, key_map).await {
+        Err(e) if not_mine(&e) => {}
+        other => return other,
+    }
+    match handle_flow_step_benchmarks(id, key_map).await {
+        Err(e) if not_mine(&e) => {}
+        other => return other,
+    }
+    match handle_flow_benchmarks(id, key_map).await {
+        Err(e) if not_mine(&e) => {}
+        other => return other,
+    }
+    anyhow::bail!("Coding agent does not support this id: '{id}'")
 }
 
 /// The main entry point for the mock agent server.

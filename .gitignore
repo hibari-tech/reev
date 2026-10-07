@@ -6,3 +6,6 @@ test-ledger
 logs
 .log
 node_modules
+
+# reev-trust local attester key
+trust/attester*.json

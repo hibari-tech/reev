@@ -3923,6 +3923,7 @@ dependencies = [
  "clap",
  "dotenvy",
  "flate2",
+ "futures",
  "glob",
  "jup-sdk",
  "libc",
@@ -3936,6 +3937,7 @@ dependencies = [
  "reev-tools",
  "reqwest",
  "rstest",
+ "serde",
  "serde_json",
  "serde_yaml",
  "sha2 0.10.9",
@@ -3982,6 +3984,19 @@ dependencies = [
  "tracing-opentelemetry",
  "tracing-subscriber",
  "uuid",
+]
+
+[[package]]
+name = "reev-trust"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+ "solana-client",
+ "solana-sdk",
 ]
 
 [[package]]

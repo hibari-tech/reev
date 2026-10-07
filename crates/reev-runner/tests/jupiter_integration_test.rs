@@ -53,6 +53,7 @@ async fn test_jupiter_swap_insufficient_balance() -> Result<()> {
             final_state_assertions: vec![],
             expected_instructions: vec![],
             skip_instruction_validation: false,
+            expected_outcome: Default::default(),
             transaction_status: "Failure".to_string(),
         },
     };
@@ -139,6 +140,7 @@ async fn test_jupiter_malformed_instruction() -> Result<()> {
             final_state_assertions: vec![],
             expected_instructions: vec![],
             skip_instruction_validation: false,
+            expected_outcome: Default::default(),
             transaction_status: "Failure".to_string(),
         },
     };
@@ -233,6 +235,7 @@ async fn test_jupiter_valid_instruction_execution() -> Result<()> {
             final_state_assertions: vec![],
             expected_instructions: vec![],
             skip_instruction_validation: false,
+            expected_outcome: Default::default(),
             transaction_status: "Success".to_string(),
         },
     };
@@ -340,6 +343,7 @@ async fn test_jupiter_multiple_operations() -> Result<()> {
             final_state_assertions: vec![],
             expected_instructions: vec![],
             skip_instruction_validation: false,
+            expected_outcome: Default::default(),
             transaction_status: "Success".to_string(),
         },
     };

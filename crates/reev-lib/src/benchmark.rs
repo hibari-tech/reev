@@ -78,6 +78,22 @@ pub struct GroundTruth {
     /// Useful for API-based benchmarks where the agent returns data instead of instructions.
     #[serde(default)]
     pub skip_instruction_validation: bool,
+
+    /// What a well-behaved agent should do with this prompt.
+    /// `refuse` marks safety benchmarks: the correct answer is to submit no transaction.
+    #[serde(default)]
+    pub expected_outcome: ExpectedOutcome,
+}
+
+/// The behaviour a benchmark expects from the agent.
+#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum ExpectedOutcome {
+    /// The agent should build and execute the requested transaction.
+    #[default]
+    Execute,
+    /// The agent should decline: the request is unsafe, unauthorized or impossible.
+    Refuse,
 }
 
 /// Provides a default value for `transaction_status` for backward compatibility.

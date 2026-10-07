@@ -23,6 +23,7 @@ use tracing::{debug, info, instrument, warn};
 
 use crate::dependency::{DependencyConfig, DependencyManager};
 
+pub mod council;
 pub mod dependency;
 pub mod renderer;
 
@@ -193,7 +194,8 @@ pub async fn run_benchmarks(
                 Arc::clone(&db),
                 &session_id,
             )
-            .await?;
+            .await
+            .inspect_err(|_| record_crash(&session_id, &test_case.id, &council::agent_label(agent_name)))?;
             results.push(result);
 
             // Stop reev-agent after flow benchmark completion
@@ -220,7 +222,7 @@ pub async fn run_benchmarks(
         let session_logger = Some(create_session_logger(
             session_id.clone(),
             test_case.id.clone(),
-            agent_name.to_string(),
+            council::agent_label(agent_name),
             Some(path),
         )?);
 
@@ -233,7 +235,7 @@ pub async fn run_benchmarks(
         let session_info = reev_lib::db::SessionInfo {
             session_id: session_id.clone(),
             benchmark_id: test_case.id.clone(),
-            agent_type: agent_name.to_string(),
+            agent_type: council::agent_label(agent_name),
             interface: "tui".to_string(),
             start_time,
             end_time: None,
@@ -296,6 +298,7 @@ pub async fn run_benchmarks(
                         );
                     }
 
+                    record_crash(&session_id, &test_case.id, &council::agent_label(agent_name));
                     return Err(e).context(format!(
                         "Evaluation loop failed for benchmark: {}",
                         test_case.id
@@ -342,6 +345,9 @@ pub async fn run_benchmarks(
             // Store ExecutionTrace format directly for ASCII tree compatibility
             match session_logger.complete_with_trace(trace.clone()) {
                 Ok(log_file) => {
+                    if let Err(e) = reev_lib::session_logger::set_final_score(&log_file, score) {
+                        warn!(benchmark_id = %test_case.id, "Failed to record final score in session log: {e}");
+                    }
                     info!(
                         benchmark_id = %test_case.id,
                         log_file = %log_file.display(),
@@ -622,6 +628,20 @@ async fn extract_tool_calls_from_agent_logs(session_id: &str) -> Vec<reev_flow::
 }
 
 /// Execute a flow benchmark step-by-step
+/// A benchmark that aborts with an error is a failure, not a missing result: record it as 0
+/// so score aggregation cannot be improved by crashing.
+fn record_crash(session_id: &str, benchmark_id: &str, agent_name: &str) {
+    if let Err(e) = reev_lib::session_logger::write_summary_session_log(
+        Path::new("logs/sessions"),
+        session_id,
+        benchmark_id,
+        agent_name,
+        0.0,
+    ) {
+        warn!(benchmark_id, "Failed to record crashed benchmark: {e}");
+    }
+}
+
 async fn run_flow_benchmark(
     test_case: &TestCase,
     flow_steps: &[FlowStep],
@@ -794,6 +814,18 @@ async fn run_flow_benchmark(
         }
     }
 
+    // Flow runs log to logs/flows; also leave a session log with the real score so
+    // session-based consumers (e.g. the trust report) see every benchmark.
+    if let Err(e) = reev_lib::session_logger::write_summary_session_log(
+        Path::new("logs/sessions"),
+        session_id,
+        &test_case.id,
+        &council::agent_label(agent_name),
+        score,
+    ) {
+        warn!(benchmark_id = %test_case.id, "Failed to write flow session log: {e}");
+    }
+
     let result = TestResult::new(test_case, final_status, score, flow_trace);
 
     // Close environment
@@ -862,15 +894,37 @@ async fn run_evaluation_loop(
         )
         .await?;
 
+    // Verify the action before it executes: a council of independent models must agree.
+    let mut actions = actions;
+    // API benchmarks return data rather than a transaction, so there is nothing to verify.
+    let verdict = if council::enabled()
+        && !actions.is_empty()
+        && !test_case.ground_truth.skip_instruction_validation
+    {
+        let observation = council::refresh_balances(&env.rpc_client, initial_observation);
+        let verdict = council::review(&test_case.prompt, &actions, &observation).await;
+        if !verdict.executes() {
+            info!(benchmark_id = %test_case.id, decision = ?verdict.decision, "Verifier council blocked the transaction");
+            actions.clear();
+        }
+        Some(verdict)
+    } else {
+        None
+    };
+
     // The environment's step function now takes a vector of actions to be bundled
     // into a single transaction.
     let step_result = env.step(actions.clone(), &test_case.ground_truth)?;
 
+    let mut info = step_result.info;
+    if let (Some(verdict), Some(obj)) = (&verdict, info.as_object_mut()) {
+        obj.insert("council".into(), serde_json::to_value(verdict).unwrap_or_default());
+    }
     let trace_step = reev_lib::trace::TraceStep {
         thought: None,
         action: actions.clone(),
         observation: step_result.observation.clone(),
-        info: step_result.info,
+        info,
     };
     trace.add_step(trace_step);
     info!("Episode finished.");
