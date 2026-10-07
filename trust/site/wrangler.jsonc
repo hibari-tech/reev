@@ -1,0 +1,10 @@
+{
+  // Agent Trust Score leaderboard: static assets only, no bindings, no secrets.
+  // Deploy with `wrangler deploy` from this directory.
+  "name": "agent-trust",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./",
+    "not_found_handling": "none"
+  }
+}

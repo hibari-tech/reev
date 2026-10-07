@@ -9,3 +9,6 @@ node_modules
 
 # reev-trust local attester key
 trust/attester*.json
+
+# wrangler local state
+.wrangler
