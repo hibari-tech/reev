@@ -74,8 +74,8 @@ pub mod defaults {
     /// Default SOL swap amount for medium tests
     pub const SOL_SWAP_AMOUNT_MEDIUM: u64 = sol::HALF; // 0.5 SOL
 
-    /// Default USDC amount for lending tests
-    pub const USDC_LEND_AMOUNT: u64 = usdc::TEN; // 10 USDC
+    /// USDC amount for the lend deposit/withdraw benchmarks (111, 113), whose prompts ask for 50 USDC
+    pub const USDC_LEND_AMOUNT: u64 = usdc::FIFTY; // 50 USDC
 
     /// Default USDC amount for larger lending tests
     pub const USDC_LEND_AMOUNT_LARGE: u64 = 50_000_000; // ~50 USDC (accounting for swap output)

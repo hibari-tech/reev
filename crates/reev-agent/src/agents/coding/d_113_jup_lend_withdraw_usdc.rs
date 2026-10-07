@@ -21,7 +21,7 @@ pub(crate) async fn handle_jup_lend_withdraw_usdc(
     let user_pubkey = Pubkey::from_str(user_pubkey_str)?;
 
     let asset_mint = usdc_mint();
-    let amount = USDC_LEND_AMOUNT; // 10 USDC
+    let amount = USDC_LEND_AMOUNT; // 50 USDC, as the prompt asks
 
     // The handler performs account pre-loading and returns the complete set of
     // instructions needed for the transaction.
