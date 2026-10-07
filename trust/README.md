@@ -13,18 +13,21 @@ what is new.
 
 ## Results (attested report)
 
-Report `b89eb875348cf521b129e14b7dead8bbd442e4a69b802951868c3b937dc0b1a6`
-(`trust/report.json`, 18 benchmarks, 72 evidence files):
+Report `7c959bd2c5e06b8bb04475eb9ba32a3bf330775b9677fbe11063b4470c3e2266`
+(`trust/report.json`, 18 benchmarks, 90 evidence files):
 
 | Agent | Capability | Safety | Trust | Grade |
 |---|---|---|---|---|
 | deterministic (ground-truth oracle) | 92.6% | 100% | 97.0 | A |
+| glm-5.3 + verifier council (glm-5.3, glm-4.6) | 86.8% | 100% | 94.5 | A |
 | glm-5.3 | 84.9% | 100% | 93.7 | A |
 | naive + verifier council (glm-5.3, glm-4.6) | 84.9% | 100% | 93.7 | A |
-| naive (obeys every instruction) | 92.6% | 5% | 16.1 | D |
+| naive (obeys every instruction) | 92.6% | 5.0% | 16.1 | D |
 
-The same naive agent goes from D to A behind the verifier council, at a cost of 7.7
-points of capability.
+The same naive agent goes from D to A behind the verifier council, at a cost of
+7.7 points of capability. For glm-5.3 the council did not cost capability in this run:
+84.9% alone and 86.8% with the council (trust 93.7 and 94.5). This is one run each, and
+the swap benchmarks vary between runs, so treat the gap as noise, not an improvement.
 
 ## Verifiable trust, in three checks
 
@@ -129,10 +132,11 @@ Attester / evaluator: `HNKyE1jzmwNfZ5rGX9toZqXfjW2EvsuQETwnDmocW7d1`
 
 | Agent | Memo attestation | Registry asset |
 |---|---|---|
-| deterministic | `5bu9gQHV…HqBp274f` | `6y7BL7Wdgt7o1RurGrF9bGwjzvoT1nX1gL491EGzjzVY` |
-| glm-5.3 | `5bxBgdXe…oi1HPY13` | `Dy75NZysJkPga1YpR2XVDJFPgx4Jw6qBEHv6VSGdj66q` |
-| naive | `5YEmk6Gx…ihANUX66` | `4Qu5HcVBTDMMoA4XC1NsqCSUgqMCzktbav1vujTXrZqr` |
-| naive+council | `5op4aUdk…sCCZUP5v` | `DUKW6Zg6zhs3z72GfnE8ReKDdEJKdVLGrAavRTVuM116` |
+| deterministic | `2TjsbX3J…ErYFL9un` | `6y7BL7Wdgt7o1RurGrF9bGwjzvoT1nX1gL491EGzjzVY` |
+| glm-5.3+council | `5Hr3Ys2Q…kHFKen3U` | `2CNe3eCZyKEpU54b8CwpquV4BFsZj5dRzJFXsCHH2wpT` |
+| glm-5.3 | `3V1y1dzN…XJqPLVLs` | `Dy75NZysJkPga1YpR2XVDJFPgx4Jw6qBEHv6VSGdj66q` |
+| naive+council | `5Zois5Vg…Ua393NQN` | `DUKW6Zg6zhs3z72GfnE8ReKDdEJKdVLGrAavRTVuM116` |
+| naive | `34QYDVn2…WZcUseTJ` | `4Qu5HcVBTDMMoA4XC1NsqCSUgqMCzktbav1vujTXrZqr` |
 
 Full signatures: `trust/site/attestation.json` and `trust/registry/agents-devnet.json`.
 Each registry feedback carries `value` = trust score, `score` = rounded 0-100,
@@ -169,7 +173,7 @@ tags `reevTrustScore` / grade, and a `feedbackUri` to the memo transaction.
 
 reev was built by the [gist-rs](https://github.com/gist-rs) team before this work; its last
 upstream commit used here is `6e09066` (2025-10-28). Everything below was added on the
-`trust-score` branch on 2026-10-07 (commits `d024d3c`..`5e147f9`):
+`trust-score` branch on 2026-10-07 (commits `d024d3c`..HEAD):
 
 - `d024d3c` fixes in existing reev code: Jupiter Lend ATA creation (lend benchmarks were
   failing with `AccountNotInitialized`), GLM model routing, a UTF-8 truncation panic.
@@ -180,6 +184,9 @@ upstream commit used here is `6e09066` (2025-10-28). Everything below was added 
 - `771782e` re-scored and re-attested report.
 - `3efe49c` Solana Agent Registry (8004) publishing.
 - `5e147f9` leaderboard restyle and registry links.
+- `0a008a1` this README.
+- `60aaa0a` council describer names Jupiter Lend positions and hides harness placeholders.
+- `095cdb1` glm-5.3 + council run; report re-attested and registry feedback republished.
 
 Solana is a trademark of the Solana Foundation. This project is not affiliated with or
 endorsed by the Solana Foundation.
