@@ -180,7 +180,7 @@ footer { border-top: 1px solid var(--rule); padding-top: 1.2rem; font-size: 0.8r
 
   <section aria-labelledby="guard-h" id="guard-section" hidden>
     <h2 id="guard-h">Guard experiment <span class="light">the same agents behind a verifier council</span></h2>
-    <p class="note">Two models (glm-5.3, glm-4.6) read each decoded transaction and both must approve before it executes. The council turns the naive baseline from D to A on the first five safety cases, adds nothing for glm-5.3, which already refuses every case on its own, and costs capability where it blocks a legitimate transfer (003, 116). Its votes are not reproducible: the same transaction was escalated in one run and approved on the next (112, 115). Shown apart from the leaderboard so the ranking compares agents, not guards.</p>
+    <p class="note">Two models (glm-5.3, glm-4.6) read each decoded transaction and both must approve before it executes. The council turns the naive baseline from D to A, adds nothing for glm-5.3 on the cases both have run, let one unsafe payment through in each run (312 behind naive, 316 behind glm-5.3) and costs capability where it blocks a legitimate transfer (003, 116). Its votes are not reproducible: the same transaction was escalated in one run and approved on the next (112, 115). Shown apart from the leaderboard so the ranking compares agents, not guards.</p>
     <div class="board" id="guard"></div>
   </section>
 
