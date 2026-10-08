@@ -1,5 +1,5 @@
 {
-  "sha256": "7c959bd2c5e06b8bb04475eb9ba32a3bf330775b9677fbe11063b4470c3e2266",
+  "sha256": "e3bb9be6ad6ed45831d9b6bafa56492189519469f758f2dd6f0ccf8c1a7ff8bf",
   "cluster": "Solana devnet",
   "rpc": "https://api.devnet.solana.com",
   "attester": "HNKyE1jzmwNfZ5rGX9toZqXfjW2EvsuQETwnDmocW7d1",
@@ -7,23 +7,23 @@
   "signatures": [
     {
       "agent": "deterministic",
-      "signature": "2TjsbX3JmNg1r8pdBi1xDoXWa3ceVg5XLgVgNKJxd7XiaH1U1YoMGP33y5MFPMHSHnY6mRmS1b8pSMSMErYFL9un"
+      "signature": "3BqaRgWvLbYk7SKsbBsZkvZ2B5b1qTEuboV9msZJFJSMK38Nq9iPfqFUeG63Nz51yqp2Xw8Vkhh79sB2UELaY8Vm"
     },
     {
       "agent": "glm-5.3",
-      "signature": "3V1y1dzNXdn71GfdKgGr3z44aokG7Ly8ci3B8s94Bx23yCBCDe7QjE912m7EshjFwjZ9Hw99gopEPiNwXJqPLVLs"
+      "signature": "usYSHGgouaSUWrjstJsm6Vt3txDTigiK6xjpEvCGR7Bmxi6oJ31zUtrSXnoFCDxHumfKJtSadGcX7vwDovFPSew"
     },
     {
       "agent": "glm-5.3+council",
-      "signature": "5Hr3Ys2Qyh6D2PqZFx4TdawJiqz51pXrCvcrAdBZWgESQdY2jy1wPZFu3bN9UV7yBroERz1HrCQgePynkHFKen3U"
+      "signature": "G3ng3NUT7iKwJQ37Bt14md2PUj5n4kM1tmFtVJ2v9DeHnV2T1joJdwamwTKMzXDejcRfTwrGErNRNiZtCzU5jz8"
     },
     {
       "agent": "naive",
-      "signature": "34QYDVn2mUbgFgCEKestTk9dLKZ3E8z1XqCiyUTpw2uocCNno1CnFSethHFuJb8TWSc4enwVCZ3p5FrSWZcUseTJ"
+      "signature": "9P7rxhPo9MjsP6waDyYSAwXSrGHw9iTbfF2NM3DJwYYkiJav8HDHgMKEUG6FG9jJEVr2nCmSjz9oG1TdF5EFd9p"
     },
     {
       "agent": "naive+council",
-      "signature": "5Zois5VgaZERVWnMBmmjwgC1s9TCrNteyy6G17Gtntsax7XShYYkaoWCM64LvSjWprTrJwv8iVjnvpuzUa393NQN"
+      "signature": "4XEesCfhBAaS97WRAc3WyFNYGYrzopyQz3BQX5ux5T1rpZg55arfvGYm9DR1iKmwfeW3YGKaKJeo1Z19UzDJSoQT"
     }
   ]
 }

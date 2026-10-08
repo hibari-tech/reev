@@ -15,11 +15,11 @@ what is new.
 
 ## Results
 
-Current report `e3bb9be6ad6ed45831d9b6bafa56492189519469f758f2dd6f0ccf8c1a7ff8bf`
-(`trust/report.json`, 43 benchmarks, 195 evidence files; `reev-trust audit` passes). It is
-not attested yet: the on-chain attestation, the registry feedback and the live leaderboard
-still point at the previous report `7c959bd2…` (18 benchmarks, 90 evidence files, kept as
-`trust/site/report.json`) until this one is attested and published.
+Report `e3bb9be6ad6ed45831d9b6bafa56492189519469f758f2dd6f0ccf8c1a7ff8bf`
+(`trust/report.json`, 43 benchmarks, 195 evidence files; `reev-trust audit` passes),
+attested on devnet and published to the registry on 2026-10-08; see
+[On-chain records](#on-chain-records-devnet). The previous attested report was
+`7c959bd2…` (18 benchmarks, 2026-10-07).
 
 | Agent | Capability | Safety | Trust | Grade |
 |---|---|---|---|---|
@@ -199,11 +199,11 @@ Attester / evaluator: `HNKyE1jzmwNfZ5rGX9toZqXfjW2EvsuQETwnDmocW7d1`
 
 | Agent | Memo attestation | Registry asset |
 |---|---|---|
-| deterministic | `2TjsbX3J…ErYFL9un` | `6y7BL7Wdgt7o1RurGrF9bGwjzvoT1nX1gL491EGzjzVY` |
-| glm-5.3+council | `5Hr3Ys2Q…kHFKen3U` | `2CNe3eCZyKEpU54b8CwpquV4BFsZj5dRzJFXsCHH2wpT` |
-| glm-5.3 | `3V1y1dzN…XJqPLVLs` | `Dy75NZysJkPga1YpR2XVDJFPgx4Jw6qBEHv6VSGdj66q` |
-| naive+council | `5Zois5Vg…Ua393NQN` | `DUKW6Zg6zhs3z72GfnE8ReKDdEJKdVLGrAavRTVuM116` |
-| naive | `34QYDVn2…WZcUseTJ` | `4Qu5HcVBTDMMoA4XC1NsqCSUgqMCzktbav1vujTXrZqr` |
+| deterministic | `3BqaRgWv…UELaY8Vm` | `6y7BL7Wdgt7o1RurGrF9bGwjzvoT1nX1gL491EGzjzVY` |
+| glm-5.3 | `usYSHGgo…DovFPSew` | `Dy75NZysJkPga1YpR2XVDJFPgx4Jw6qBEHv6VSGdj66q` |
+| glm-5.3+council | `G3ng3NUT…tCzU5jz8` | `2CNe3eCZyKEpU54b8CwpquV4BFsZj5dRzJFXsCHH2wpT` |
+| naive | `9P7rxhPo…dF5EFd9p` | `4Qu5HcVBTDMMoA4XC1NsqCSUgqMCzktbav1vujTXrZqr` |
+| naive+council | `4XEesCfh…UzDJSoQT` | `DUKW6Zg6zhs3z72GfnE8ReKDdEJKdVLGrAavRTVuM116` |
 
 Full signatures: `trust/site/attestation.json` and `trust/registry/agents-devnet.json`.
 Each registry feedback carries `value` = trust score, `score` = rounded 0-100,
@@ -226,9 +226,8 @@ tags `reevTrustScore` / grade, and a `feedbackUri` to the memo transaction.
 
 ## Limitations
 
-- The on-chain attestation covers the previous report (safety benchmarks 300-304 only);
-  the current 43-benchmark report is scored and audited but not yet attested, so the
-  leaderboard and the registry lag it. The council variants have run on 300-319 only.
+- The council variants have run on safety benchmarks 300-319 only, so their rows are not
+  directly comparable with the agents' 29-case safety scores.
 - One run per agent is reported, and agents vary between runs: glm-5.3 refused 318 in one
   run and executed it in the next, and the swap benchmarks (100, 200) can fail with
   Jupiter `PriceExpired` on the fork. Treat single-benchmark differences as noise.
